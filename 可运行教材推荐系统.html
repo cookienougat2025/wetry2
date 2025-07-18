@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教材推荐系统</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .search-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        #search {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #category {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            min-width: 120px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .book {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .book:hover {
+            transform: translateY(-3px);
+        }
+        .book h3 {
+            margin-top: 0;
+            color: #3498db;
+            font-size: 20px;
+        }
+        .book-meta {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+            color: #7f8c8d;
+            flex-wrap: wrap;
+        }
+        .rating {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            font-size: 18px;
+            background-color: white;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <h1>📚 教材推荐系统</h1>
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="search" 
+                placeholder="输入书名、作者或关键词..." 
+                onkeyup="if(event.key === 'Enter') searchBooks()"
+            />
+            <select id="category">
+                <option value="全部">全部类别</option>
+                <option value="编程">编程</option>
+                <option value="算法">算法</option>
+                <option value="设计">设计</option>
+                <option value="数学">数学</option>
+            </select>
+            <button onclick="searchBooks()">搜索</button>
+        </div>
+    </div>
+
+    <div id="results">
+        <!-- 默认加载内容会在这里显示 -->
+    </div>
+
+    <script>
+        // 教材数据库
+        const books = [
+            { 
+                title: "Python编程：从入门到实践", 
+                author: "Eric Matthes", 
+                category: "编程", 
+                rating: 4.8,
+                desc: "适合Python初学者的实战指南，涵盖基础语法和项目实践。",
+                link: "https://item.jd.com/11993134.html"
+            },
+            { 
+                title: "算法导论", 
+                author: "Thomas H. Cormen", 
+                category: "算法", 
+                rating: 4.9,
+                desc: "算法领域的经典教材，涵盖所有重要算法和数据结构。",
+                link: "https://item.jd.com/11144230.html"
+            },
+            { 
+                title: "设计心理学", 
+                author: "Donald Norman", 
+                category: "设计", 
+                rating: 4.7,
+                desc: "理解用户心理与设计原则的必读之作。",
+                link: "https://item.jd.com/10058776.html"
+            },
+            { 
+                title: "线性代数应该这样学", 
+                author: "Sheldon Axler", 
+                category: "数学", 
+                rating: 4.6,
+                desc: "强调线性变换的直观理解，适合数学系学生。",
+                link: "https://item.jd.com/12437641.html"
+            }
+        ];
+
+        // 搜索函数
+        function searchBooks() {
+            const keyword = document.getElementById("search").value.toLowerCase();
+            const category = document.getElementById("category").value;
+            
+            const filteredBooks = books.filter(book => 
+                (book.title.toLowerCase().includes(keyword) || 
+                 book.author.toLowerCase().includes(keyword) ||
+                 book.desc.toLowerCase().includes(keyword)) &&
+                (category === "全部" || book.category === category)
+            );
+            
+            displayResults(filteredBooks);
+        }
+
+        // 显示结果
+        function displayResults(books) {
+            const resultsDiv = document.getElementById("results");
+            
+            if (books.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <p>🔍 没有找到匹配的教材</p>
+                        <p>尝试更换关键词或类别</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            resultsDiv.innerHTML = books.map(book => `
+                <div class="book" onclick="window.open('${book.link}', '_blank')">
+                    <h3>${book.title}</h3>
+                    <div class="book-meta">
+                        <span><strong>作者：</strong>${book.author}</span>
+                        <span><strong>类别：</strong>${book.category}</span>
+                        <span class="rating">⭐ ${book.rating}/5.0</span>
+                    </div>
+                    <p>${book.desc}</p>
+                    <a href="${book.link}" target="_blank" style="color: #3498db; text-decoration: none;">查看详情 →</a>
+                </div>
+            `).join("");
+        }
+
+        // 页面加载时立即显示所有教材
+        document.addEventListener('DOMContentLoaded', function() {
+            displayResults(books);
+        });
+    </script>
+</body>
+</html>
